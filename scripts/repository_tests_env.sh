@@ -1,0 +1,6 @@
+export fusio_test_db_type=postgres
+export fusio_test_db_port=5432
+export fusio_test_db_user=user
+export fusio_test_db_password=password
+export fusio_test_db_database=fusion_test
+export fusio_test_db_host=localhost

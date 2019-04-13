@@ -1,0 +1,61 @@
+### Fusio service configuration
+
+## General settings
+general:
+  # MODE prod|dev
+  mode: prod
+  # Remove old data, currently only false supported
+  remove_old_data: false
+  # Server secret key, don't lose this. Autocreated if empty
+  secret_key: ""
+  # Token expire time in days
+  token_expire_time: 14d
+
+## Server settings
+server:
+  # Ip address to bind to 
+  listen_to: 127.0.0.1
+  # Port
+  port: 8080
+
+## Database
+database:
+  # Supported types: sqlite|postgresql|mysql
+  type: postgresql
+  host: localhost
+  port: 5423
+  database: fusio
+  username: fusio
+  password: fusio
+  # File location if using sqlite
+  file: ""
+
+## InfluxDB
+influxdb:
+  host: localhost
+  port: 8096
+  database: fusio
+
+## Alarms
+alarms:
+  # Evaluate alarms in background
+  runbackground: true
+  # Interval for evaluations. This is minimum interval
+  # and overrides each alarms interval if they are smaller
+  interval: 2m
+
+## Logging
+logging:
+  # Log directory
+  directory: /var/log/fusio
+  # Main log file
+  main_file: fusio.log
+  # Log level debug|info|warning|erorr|fatal
+  level: info
+  # Sql log file
+  sql_file: sql.log
+  # Log sql-queries. 
+  log_sql: false
+  # Log http-requests
+  log_requests: false
+  requests_file: http.log
