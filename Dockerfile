@@ -18,6 +18,9 @@ RUN mkdir /etc/fusio /var/log/fusio
 
 COPY --from=builder /app/fusio /app/
 
+VOLUME /etc/fusio
+VOLUME /var/log/fusio
+
 EXPOSE 8080
 ENTRYPOINT ["/app/fusio", "-c", "/etc/fusio/config.yaml"]
 
