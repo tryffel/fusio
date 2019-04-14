@@ -112,7 +112,7 @@ func (c *Config) LoadConfig() {
 	c.General.TokenExpires = "14d"
 	c.General.tokenExpiration = time.Hour * 24 * 14
 
-	c.preferences.Host = "Test"
+	c.preferences.Host = "Fusio"
 	c.preferences.ServerVersion = ServiceVersion
 	c.preferences.TokenExpires = true
 	c.preferences.TokenDuration = c.General.tokenExpiration
