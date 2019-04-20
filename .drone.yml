@@ -4,6 +4,23 @@ name: default
 steps:
 - name: tests
   image: golang
+  environment:
+    fusio_test_db_type: postgres
+    fusio_test_db_port: 
+      from_secret: 
+        fusio_test_db_port
+    fusio_test_db_host:
+      from_secret:
+        fusio_test_db_host
+    fusio_test_db_database:
+      from_secret:
+        fusio_test_db_database
+    fusio_test_db_user:
+      from_secret:
+        fusio_test_db_user
+    fusio_test_db_password:
+      from_secret:
+        fusio_test_db_password
   commands:
   - go mod download
   - go build
