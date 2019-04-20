@@ -37,7 +37,7 @@ func NewDatabase(c *config.Database, p *config.LoggingPreferences, logger *util.
 		url := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s",
 			c.Host, c.Port, c.Username, c.Database, c.Password)
 		engine, err = gorm.Open("postgres", url)
-		db.db = fmt.Sprintf("postgres://%s:%d/%s", c.Host, c.Port, c.Database)
+		db.db = fmt.Sprintf("postgres://%s:%s/%s", c.Host, c.Port, c.Database)
 	case "mysql":
 		engine, err = gorm.Open("mysql",
 			fmt.Sprintf("%s:%s@%s:%s/%s?charset=utf8mb4&parseTime=True&loc=Local",
