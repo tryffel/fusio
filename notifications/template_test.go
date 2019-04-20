@@ -8,10 +8,13 @@ import (
 
 func TestNotification_ParseOk(t *testing.T) {
 	tmpl := "Alarm {{.AlarmName}} has fired at {{.Timestamp}}"
-	ts := time.Now()
+
+	ts := time.Now().Format(time.Kitchen)
+
 	n := Notification{
-		AlarmName: "test_alarm",
-		Timestamp: ts,
+		AlarmName:     "test_alarm",
+		Timestamp:     ts,
+		TimestampUnix: fmt.Sprintf("%d", time.Now().Second()),
 	}
 
 	data, err := n.Parse(tmpl)
@@ -19,14 +22,15 @@ func TestNotification_ParseOk(t *testing.T) {
 		t.Error(err)
 	}
 
-	if data != fmt.Sprintf("Alarm %s has fired at %s", n.AlarmName, n.Timestamp.String()) {
+	if data != fmt.Sprintf("Alarm %s has fired at %s", n.AlarmName, n.Timestamp) {
 		t.Error("Parsed text doesn't match")
 	}
 }
 
 func TestNotification_ParseInvalidTemplate(t *testing.T) {
 	tmpl := "Alarm {{.AlarmName}} has fired at {{.Timestamp}"
-	ts := time.Now()
+	ts := time.Now().Format(time.Kitchen)
+
 	n := Notification{
 		AlarmName: "test_alarm",
 		Timestamp: ts,
