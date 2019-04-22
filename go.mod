@@ -11,7 +11,7 @@ require (
 	github.com/influxdata/influxdb1-client v0.0.0-20190402204710-8ff2fc3824fc
 	github.com/jinzhu/gorm v1.9.2
 	github.com/jinzhu/inflection v0.0.0-20180308033659-04140366298a // indirect
-	github.com/knetic/govaluate v3.0.0+incompatible
+	github.com/knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible
 	github.com/lib/pq v1.0.0
 	github.com/mattn/go-colorable v0.1.1 // indirect
 	github.com/mattn/go-sqlite3 v1.10.0 // indirect
