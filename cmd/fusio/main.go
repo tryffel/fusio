@@ -5,6 +5,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/tryffel/fusio"
 	"github.com/tryffel/fusio/config"
+	"github.com/tryffel/fusio/err"
 	"github.com/x-cray/logrus-prefixed-formatter"
 	"os"
 	"path/filepath"
@@ -20,10 +21,13 @@ func main() {
 	logFormat.ForceFormatting = true
 	logrus.SetFormatter(logFormat)
 
-	parser := argparse.NewParser("ws", "Fusio server")
+	parser := argparse.NewParser("fusio", "Fusio server, IoT server written in Go. For more help see --help. "+
+		"For basic usage, run fusio -c <config-file>.")
 	configFile := parser.String("c", "Config", &argparse.Options{Required: false, Help: "Configuration file"})
 	createConfig := parser.Flag("n", "new", &argparse.Options{Required: false, Help: "Create new configuration file"})
 	loadDemo := parser.Flag("d", "demo", &argparse.Options{Required: false, Help: "Load demo data"})
+
+	migrator := NewMigrator(parser)
 
 	err := parser.Parse(os.Args)
 	if err != nil {
@@ -50,8 +54,14 @@ func main() {
 	conf.LoadConfig()
 	service, err := fusio.NewService(&conf)
 	if err != nil {
-		logrus.Error(err)
-		logrus.Error("Couldn't start service, exiting...")
+		e := Err.Wrap(&err, "failed to start fusio server")
+		Err.Log(e)
+		os.Exit(1)
+	}
+
+	err = migrator.RunMigrations(service.Store.GetDb())
+	if err != nil {
+		Err.Log(err)
 		os.Exit(1)
 	}
 	service.Start()

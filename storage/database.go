@@ -42,7 +42,7 @@ func NewDatabase(c *config.Database, p *config.LoggingPreferences, logger *util.
 		engine, err = gorm.Open("mysql",
 			fmt.Sprintf("%s:%s@%s:%s/%s?charset=utf8mb4&parseTime=True&loc=Local",
 				c.Username, c.Password, c.Host, c.Port, c.Database))
-		db.db = fmt.Sprintf("mysql://%s:%d/%s", c.Host, c.Port, c.Database)
+		db.db = fmt.Sprintf("mysql://%s:%s/%s", c.Host, c.Port, c.Database)
 
 	default:
 		logrus.Fatal("Invalid database type configured!")
@@ -92,16 +92,6 @@ func (db *Database) GetEngine() *gorm.DB {
 func (db *Database) runMigrations() {
 	logrus.Debug("Running db migrations")
 
-	db.engine.AutoMigrate(&models.User{})
-	db.engine.AutoMigrate(&models.Device{})
-	db.engine.AutoMigrate(&models.Measurement{})
-	db.engine.AutoMigrate(&models.Group{})
-	db.engine.AutoMigrate(&models.Alarm{})
-	db.engine.AutoMigrate(&models.AlarmHistory{})
-	db.engine.AutoMigrate(&models.ApiKey{})
-	db.engine.AutoMigrate(&models.OutputChannel{})
-	db.engine.AutoMigrate(&models.Output{})
-	db.engine.AutoMigrate(&models.OutputHistory{})
 }
 
 func (db *Database) DemoData() {
