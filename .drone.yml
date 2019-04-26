@@ -41,10 +41,3 @@ steps:
     status:
     - failure
 
-
-trigger:
-  branch:
-  - master
-
-
-
