@@ -1,9 +1,7 @@
 package dtos
 
 import (
-	"github.com/tryffel/fusio/util"
 	"testing"
-	"time"
 )
 
 func TestAlarmDtoToAlarm(t *testing.T) {
@@ -13,7 +11,7 @@ func TestAlarmDtoToAlarm(t *testing.T) {
 		Group:    "abcd-1234",
 		Message:  "test message",
 		Enabled:  true,
-		Interval: util.Interval(time.Second * 60),
+		Interval: "60s",
 		Trigger:  10,
 		Filter:   "mean(temperature) - derivative(max(temperature),10) > 10",
 	}
