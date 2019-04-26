@@ -47,7 +47,7 @@ func (l *SqlLogger) Print(v ...interface{}) {
 }
 
 func (l *SqlLogger) Info(args ...interface{}) {
-	l.Logger.Info(args)
+	l.Logger.Info(args...)
 }
 
 func (l *SqlLogger) WithFields(fields logrus.Fields) *logrus.Entry {

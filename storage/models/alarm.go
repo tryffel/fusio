@@ -174,7 +174,7 @@ func (a *Alarm) Clear(db *gorm.DB, timestamp time.Time) error {
 	h := &AlarmHistory{}
 	db.Where("alarm_id = ? AND cleared = False", a.ID).First(h)
 	if h.ID < 1 {
-		return errors.New(fmt.Sprintf("No alarm_history found for alarm ", a.ID))
+		return errors.New(fmt.Sprintf("No alarm_history found for alarm %s", a.ID))
 	}
 
 	h.Cleared = true
