@@ -34,10 +34,15 @@ func NewDatabase(c *config.Database, p *config.LoggingPreferences, logger *util.
 		engine, err = gorm.Open("sqlite3", c.File)
 		db.db = c.File
 	case "postgres":
-		url := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s",
-			c.Host, c.Port, c.Username, c.Database, c.Password)
+		ssl := "disable"
+		if c.Ssl {
+			ssl = "require"
+		}
+
+		url := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
+			c.Host, c.Port, c.Username, c.Database, c.Password, ssl)
 		engine, err = gorm.Open("postgres", url)
-		db.db = fmt.Sprintf("postgres://%s:%s/%s", c.Host, c.Port, c.Database)
+		db.db = fmt.Sprintf("postgres://%s:%s/%s, ssl: %s", c.Host, c.Port, c.Database, ssl)
 	case "mysql":
 		engine, err = gorm.Open("mysql",
 			fmt.Sprintf("%s:%s@%s:%s/%s?charset=utf8mb4&parseTime=True&loc=Local",

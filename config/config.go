@@ -52,6 +52,7 @@ type Database struct {
 	Username string `yaml:"username"`
 	Password string `yaml:"password"`
 	File     string `yaml:"file"`
+	Ssl      bool   `yaml:"ssl"`
 	loadDemo bool
 }
 
