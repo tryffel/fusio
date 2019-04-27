@@ -85,7 +85,7 @@ func NewService(config *config.Config) (*Service, error) {
 	logrus.SetOutput(service.logFile)
 	logrus.AddHook(&util.StdLogger{})
 
-	store, err := storage.NewStore(&config.Database, &config.Influxdb, &config.GetPreferences().Logging, sqlLog)
+	store, err := storage.NewStore(&config.Database, &config.TimeSeries.Influxdb, &config.GetPreferences().Logging, sqlLog)
 	if err != nil {
 		logrus.Fatal("Failed initializing database connection: ", err)
 		panic("Failed to initialize database")

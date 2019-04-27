@@ -1,7 +1,9 @@
 package config
 
 import (
+	"errors"
 	"github.com/sirupsen/logrus"
+	"github.com/tryffel/fusio/err"
 	"github.com/tryffel/fusio/util"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
@@ -12,6 +14,8 @@ import (
 const (
 	ServiceVersion string = "0.2.0"
 	SecretKeySize  int    = 60
+	UseInfluxdb    string = "influxdb"
+	UseTimescale   string = "timescaledb"
 )
 
 // Config root part
@@ -19,7 +23,7 @@ type Config struct {
 	General        General
 	Server         Server
 	Database       Database
-	Influxdb       Influxdb
+	TimeSeries     TimeSeries
 	Alarms         Alarms
 	Metrics        Metrics
 	Logging        Logging
@@ -62,6 +66,28 @@ type Influxdb struct {
 	Database string `yaml:"database"`
 }
 
+type Timescale struct {
+}
+
+// Retentionpolicy defines single time window
+type RetentionPolicy struct {
+	// Total duration for retention
+	Duration util.Interval `yaml:"total_duration"`
+	// Interval of samples, data is downsampled to this interval
+	Interval util.Interval `yaml:"sample_interval"`
+	// Duration of timescale chunk. No effect on influxdb. Chunk size affects
+	// the efficiency of queries, since each query would benefit of only querying single bucket.
+	// It is also recommended to set the bucket size so that fits in ram.
+	ChunkInterval util.Interval `yaml:"chunk_interval"`
+}
+
+type TimeSeries struct {
+	Backend    string            `yaml:"backend"`
+	Influxdb   Influxdb          `yaml:"influxdb"`
+	Timescale  Timescale         `yaml:"timescale"`
+	Retentions []RetentionPolicy `yaml:"retentions"`
+}
+
 type Logging struct {
 	Directory      string `yaml:"directory"`
 	MainLogFile    string `yaml:"main_file"`
@@ -93,7 +119,7 @@ func NewConfig(location string, name string) Config {
 }
 
 // LoadConfig Read configuration file
-func (c *Config) LoadConfig() {
+func (c *Config) LoadConfig() error {
 	location := filepath.Join(c.configPath, c.configFile)
 	data, err := ioutil.ReadFile(location)
 	if err != nil {
@@ -125,7 +151,20 @@ func (c *Config) LoadConfig() {
 	}
 	c.preferences.Metrics = c.General.Metrics
 
+	if c.TimeSeries.Backend == "" {
+		return &Err.Error{Code: Err.Einternal, Err: errors.New("no timeseries backend defined")}
+	}
+	if c.TimeSeries.Backend != UseInfluxdb && c.TimeSeries.Backend != UseTimescale {
+		return &Err.Error{Code: Err.Einternal, Err: errors.New("invalid timeseries backend defined")}
+	}
+
+	if len(c.TimeSeries.Retentions) == 0 {
+		logrus.Warn("Using default retentions")
+		c.TimeSeries.Retentions = DefaultRetentions
+	}
+
 	c.SaveFile()
+	return nil
 }
 
 // CreatFile Create empty configuration file
