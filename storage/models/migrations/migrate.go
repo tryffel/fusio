@@ -42,6 +42,7 @@ func (m migration) Run(db *gorm.DB) error {
 
 var Migrations = []Migration{
 	migration{level: 1, name: "initial schema", f: initialSchema},
+	migration{level: 2, name: "create pipelines & pipeline blocks", f: createPipelines},
 }
 
 // Run migrations, if target = -1, run all migrations, otherwise migrate to given level
