@@ -21,6 +21,7 @@ type Config struct {
 	Database       Database
 	Influxdb       Influxdb
 	Alarms         Alarms
+	Pipelines      Pipelines
 	Metrics        Metrics
 	Logging        Logging
 	serviceVersion string
@@ -80,6 +81,15 @@ type Alarms struct {
 type Metrics struct {
 	RunMetrics bool          `yaml:"enabled"`
 	Interval   util.Interval `yaml:"interval"`
+}
+
+type Pipelines struct {
+	Enabled     bool          `yaml:"enabled"`
+	MinInterval util.Interval `yaml:"min_interval"`
+	// Store straight in memory if messages arrive inside interval
+	InMemoryMaxInterval util.Interval `yaml:"in_memory_max_interval"`
+	// Store in cache if messages arrive inside interval, otherwise drop from cache
+	InCacheMaxInterval util.Interval `yaml:"in_cache_max_interval"`
 }
 
 // Create new configuration
