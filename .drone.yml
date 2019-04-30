@@ -21,6 +21,8 @@ steps:
     fusio_test_db_password:
       from_secret:
         fusio_test_db_password
+    fusio_test_redis_url:
+        cache:6379
   commands:
   - go mod download
   - go build
@@ -41,3 +43,7 @@ steps:
     status:
     - failure
 
+
+services:
+- name: cache
+  image: redis

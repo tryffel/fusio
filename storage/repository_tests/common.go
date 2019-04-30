@@ -3,7 +3,9 @@ package repository_tests
 import (
 	"fmt"
 	"github.com/jinzhu/gorm"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"github.com/tryffel/fusio/config"
 	"github.com/tryffel/fusio/storage/models"
 	"github.com/tryffel/fusio/storage/repository"
 	"github.com/tryffel/fusio/storage/repository_impl"
@@ -84,7 +86,6 @@ func getDatabaseFromArgs() *Database {
 
 	db.db.AutoMigrate(&models.User{})
 	db.db.AutoMigrate(&models.Device{})
-	db.db.AutoMigrate(&models.Measurement{})
 	db.db.AutoMigrate(&models.Group{})
 	db.db.AutoMigrate(&models.Alarm{})
 	db.db.AutoMigrate(&models.AlarmHistory{})
@@ -131,7 +132,6 @@ func (db *Database) RemoveAllRecords() {
 
 	db.db.Unscoped().Delete(&models.User{})
 	db.db.Unscoped().Delete(&models.Group{})
-	db.db.Unscoped().Delete(&models.Measurement{})
 	db.db.Unscoped().Delete(&models.Group{})
 	db.db.Unscoped().Delete(&models.Alarm{})
 	db.db.Unscoped().Delete(&models.AlarmHistory{})
@@ -139,4 +139,19 @@ func (db *Database) RemoveAllRecords() {
 	db.db.Unscoped().Delete(&models.OutputChannel{})
 	db.db.Unscoped().Delete(&models.Output{})
 	db.db.Unscoped().Delete(&models.OutputHistory{})
+}
+
+func getRedisFromArgs() (repository.Cache, error) {
+	url := os.Getenv("fusio_test_redis_url")
+
+	if url == "" {
+		return nil, errors.New("no redis url defined {fusio_test_redis_url}")
+	}
+
+	c := config.Redis{
+		Type: "tcp",
+		Url:  url,
+	}
+
+	return repository_impl.NewRedis(&c)
 }
