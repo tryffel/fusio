@@ -24,6 +24,7 @@ type Database struct {
 	Output        repository.Output
 	OutputChannel repository.OutputChannel
 	Errors        repository.Errors
+	Pipeline      repository.Pipeline
 }
 
 func (d *Database) LogSql(log bool) {
@@ -83,6 +84,7 @@ func getDatabaseFromArgs() *Database {
 	db.Output = repository_impl.NewOutputRepository(db.db)
 	db.OutputChannel = repository_impl.NewOutputChannelRepository(db.db)
 	db.Errors = repository_impl.NewErrors(dbType)
+	db.Pipeline = repository_impl.NewPipelineRepository(db.db)
 
 	db.db.AutoMigrate(&models.User{})
 	db.db.AutoMigrate(&models.Device{})
@@ -139,6 +141,7 @@ func (db *Database) RemoveAllRecords() {
 	db.db.Unscoped().Delete(&models.OutputChannel{})
 	db.db.Unscoped().Delete(&models.Output{})
 	db.db.Unscoped().Delete(&models.OutputHistory{})
+	db.db.Unscoped().Delete(&models.Pipeline{})
 }
 
 func getRedisFromArgs() (repository.Cache, error) {
