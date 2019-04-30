@@ -121,9 +121,5 @@ func getDatabaseError(e error) error {
 
 	// TODO: get influxdb error
 
-	er := &Err.Error{
-		Code: Err.Einternal,
-		Err:  errors.Wrap(err, "unknown database error"),
-	}
-	return er
+	return Err.Wrap(&e, "unknown storage error")
 }
