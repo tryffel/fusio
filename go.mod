@@ -22,5 +22,6 @@ require (
 	github.com/thedevsaddam/govalidator v1.9.6
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2
 	golang.org/x/crypto v0.0.0-20190411191339-88737f569e3a
+	gopkg.in/redis.v5 v5.2.9
 	gopkg.in/yaml.v2 v2.2.2
 )

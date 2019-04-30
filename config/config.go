@@ -20,6 +20,7 @@ type Config struct {
 	Server         Server
 	Database       Database
 	Influxdb       Influxdb
+	Redis          Redis
 	Alarms         Alarms
 	Pipelines      Pipelines
 	Metrics        Metrics
@@ -61,6 +62,13 @@ type Influxdb struct {
 	Host     string `yaml:"host"`
 	Port     int    `yaml:"port"`
 	Database string `yaml:"database"`
+}
+
+type Redis struct {
+	// Type: tcp|unix
+	Type     string `yaml:"conn_type"`
+	Url      string `yaml:"url"`
+	Password string `yaml:"password"`
 }
 
 type Logging struct {

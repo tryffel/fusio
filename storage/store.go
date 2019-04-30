@@ -25,10 +25,15 @@ type Store struct {
 	Output        repository.Output
 	OutputChannel repository.OutputChannel
 	Errors        repository.Errors
+	Pipeline      repository.Pipeline
+	PipelineBlock repository.PipelineBlock
+	Cache         repository.Cache
 }
 
-func NewStore(confDb *config.Database, confInflux *config.Influxdb, logging *config.LoggingPreferences, sqlLogger *util.SqlLogger) (*Store, error) {
+func NewStore(conf *config.Config, confInflux *config.Influxdb, logging *config.LoggingPreferences, sqlLogger *util.SqlLogger) (*Store, error) {
 	store := &Store{}
+	confDb := &conf.Database
+
 	database, err := NewDatabase(confDb, logging, sqlLogger)
 	if err != nil {
 		return store, err
@@ -52,7 +57,8 @@ func NewStore(confDb *config.Database, confInflux *config.Influxdb, logging *con
 	store.Output = repository_impl.NewOutputRepository(store.database.GetEngine())
 	store.OutputChannel = repository_impl.NewOutputChannelRepository(store.database.GetEngine())
 	store.Errors = repository_impl.NewErrors(store.engine)
-	return store, nil
+	store.Cache, err = repository_impl.NewRedis(&conf.Redis)
+	return store, err
 }
 
 func (s *Store) Close() error {
