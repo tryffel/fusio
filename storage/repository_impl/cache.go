@@ -6,22 +6,31 @@ import (
 	"github.com/tryffel/fusio/err"
 	"github.com/tryffel/fusio/storage/repository"
 	"gopkg.in/redis.v5"
+	"time"
 )
 
 type redisCache struct {
 	client *redis.Client
 }
 
-func (r *redisCache) Put(key string, value interface{}, timeoutMs int) error {
-	panic("implement me")
+func (r *redisCache) Put(key string, value interface{}, timeout time.Duration) error {
+	err := r.client.Set(key, value, timeout).Err()
+	return getDatabaseError(err)
 }
 
-func (r *redisCache) Get(key string) (interface{}, error) {
-	panic("implement me")
+func (r *redisCache) Get(key string, value interface{}) error {
+	res := r.client.Get(key)
+
+	if res.Err() != nil {
+		return getDatabaseError(res.Err())
+	}
+
+	ok := res.Scan(value)
+	return getDatabaseError(ok)
 }
 
-func (r *redisCache) Delete(key string) error {
-	panic("implement me")
+func (r *redisCache) Delete(keys ...string) error {
+	return r.client.Del(keys...).Err()
 }
 
 func NewRedis(c *config.Redis) (repository.Cache, error) {
