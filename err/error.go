@@ -85,11 +85,20 @@ func (e *Error) Wrap(reason string) {
 }
 
 func (e *Error) Cause() string {
-	return errors.Cause(e.Err).Error()
+	if e.Err != nil {
+		return errors.Cause(e.Err).Error()
+	}
+	return e.Error()
 }
 
 func (e *Error) Error() string {
-	return e.Err.Error()
+	if e.Err != nil {
+		return e.Err.Error()
+	}
+	if e.Message != "" {
+		return e.Message
+	}
+	return string(e.Code)
 }
 
 // LogError logs all unidentified errors automatically and
@@ -125,4 +134,25 @@ func GetErrCode(err error) Emsg {
 		return e.Code
 	}
 	return Einternal
+}
+
+func InternalError(reason string, err error) error {
+	e := Error{
+		Code: Einternal,
+	}
+	if err == nil {
+		e.Err = errors.New(reason)
+	} else {
+		e.Err = Wrap(&err, reason)
+	}
+	return &e
+}
+
+func UserError(reason string, err error) error {
+	e := Error{
+		Code:    Einvalid,
+		Message: reason,
+		Err:     err,
+	}
+	return &e
 }
