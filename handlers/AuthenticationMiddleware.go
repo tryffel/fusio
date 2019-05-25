@@ -43,7 +43,8 @@ func (h *Handler) AuthenticationMiddleware(next http.Handler) http.Handler {
 		}
 		token := parts[1]
 
-		user, err := util.UserFromToken(token, h.Preferences.SecretKey, h.Preferences.TokenExpires, h.Preferences.TokenDuration)
+		user, err := util.UserFromToken(token, h.Preferences.SecretKey, h.Preferences.TokenExpires,
+			h.Preferences.TokenDuration)
 		if err != nil {
 			JsonErrorResponse(w, err.Error(), http.StatusForbidden)
 			return
@@ -70,11 +71,13 @@ func (h *Handler) getUser(r *http.Request) (*models.User, error) {
 	userName := r.Context().Value("UserId")
 
 	if userName == nil {
-		return nil, &Err.Error{Code: Err.Econflict, Err: errors.New("user not found")}
+		return nil, &Err.Error{Code: Err.Econflict, Message: "Authentication required",
+			Err: errors.New("user not found")}
 	}
 
 	if userName.(string) == "" {
-		return nil, &Err.Error{Code: Err.Econflict, Err: errors.New("user not found")}
+		return nil, &Err.Error{Code: Err.Econflict, Message: "Authentication required",
+			Err: errors.New("user not found")}
 	}
 	return h.Store.User.FindByName(userName.(string))
 
