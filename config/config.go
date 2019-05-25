@@ -12,6 +12,8 @@ import (
 const (
 	ServiceVersion string = "0.2.0"
 	SecretKeySize  int    = 60
+	ModeProd              = "prod"
+	ModeDev               = "dev"
 )
 
 // Config root part

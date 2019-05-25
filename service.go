@@ -40,9 +40,9 @@ type Service struct {
 	running      bool
 }
 
-func NewService(config *config.Config) (*Service, error) {
+func NewService(conf *config.Config) (*Service, error) {
 	service := &Service{
-		Config: config,
+		Config: conf,
 	}
 
 	logFormat := &prefixed.TextFormatter{
@@ -83,9 +83,16 @@ func NewService(config *config.Config) (*Service, error) {
 	}
 
 	logrus.SetOutput(service.logFile)
-	logrus.AddHook(&util.StdLogger{})
+	std := &util.StdLogger{}
+	if service.Config.General.Mode == config.ModeDev {
+		std.SetDebug(true)
+	} else {
+		std.SetDebug(false)
+	}
 
-	store, err := storage.NewStore(config, &config.Influxdb, &config.GetPreferences().Logging, sqlLog)
+	logrus.AddHook(std)
+
+	store, err := storage.NewStore(conf, &conf.Influxdb, &conf.GetPreferences().Logging, sqlLog)
 	if err != nil {
 		logrus.Fatal("Failed initializing database connection: ", err)
 		panic("Failed to initialize database")
@@ -113,11 +120,11 @@ func NewService(config *config.Config) (*Service, error) {
 	dtos.AddIntervalValidator()
 	dtos.AddDurationValidator()
 
-	service.MetricsTask, err = metrics.NewBackgroundTask(config, service.Store)
+	service.MetricsTask, err = metrics.NewBackgroundTask(conf, service.Store)
 	if err != nil {
 		return service, err
 	}
-	service.AlarmTask, err = alarm.NewBackgroundTask(*config, service.Store, service.MetricsTask)
+	service.AlarmTask, err = alarm.NewBackgroundTask(*conf, service.Store, service.MetricsTask)
 	if err != nil {
 		logrus.Fatal("", err)
 		return service, err

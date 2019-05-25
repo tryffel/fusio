@@ -8,6 +8,7 @@ import (
 )
 
 type StdLogger struct {
+	Debug bool
 }
 
 func (s *StdLogger) Fire(entry *logrus.Entry) error {
@@ -22,12 +23,28 @@ func (s *StdLogger) Fire(entry *logrus.Entry) error {
 
 // Write these levels to stdout
 func (s *StdLogger) Levels() []logrus.Level {
-	return []logrus.Level{
-		logrus.FatalLevel,
-		logrus.PanicLevel,
-		logrus.ErrorLevel,
-		logrus.WarnLevel,
+	if s.Debug {
+		return []logrus.Level{
+			logrus.FatalLevel,
+			logrus.PanicLevel,
+			logrus.ErrorLevel,
+			logrus.WarnLevel,
+			logrus.InfoLevel,
+			logrus.DebugLevel,
+		}
+	} else {
+
+		return []logrus.Level{
+			logrus.FatalLevel,
+			logrus.PanicLevel,
+			logrus.ErrorLevel,
+			logrus.WarnLevel,
+		}
 	}
+}
+
+func (s *StdLogger) SetDebug(mode bool) {
+	s.Debug = mode
 }
 
 type SqlLogger struct {
