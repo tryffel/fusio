@@ -1,6 +1,7 @@
 package Err
 
 import (
+	"encoding/json"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -99,6 +100,19 @@ func (e *Error) Error() string {
 		return e.Message
 	}
 	return string(e.Code)
+}
+
+func (e *Error) EndUserError() (string, error) {
+	data := map[string]interface{}{}
+	data["code"] = e.EndUserCode()
+	data["message"] = e.EndUserMessage()
+
+	bytes, err := json.Marshal(data)
+	if err != nil {
+		text := string(bytes)
+		return text, nil
+	}
+	return "", err
 }
 
 // LogError logs all unidentified errors automatically and
