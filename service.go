@@ -11,6 +11,7 @@ import (
 	"github.com/tryffel/fusio/err"
 	"github.com/tryffel/fusio/handlers"
 	"github.com/tryffel/fusio/metrics"
+	"github.com/tryffel/fusio/pipelines"
 	"github.com/tryffel/fusio/storage"
 	"github.com/tryffel/fusio/util"
 	prefixed "github.com/x-cray/logrus-prefixed-formatter"
@@ -33,6 +34,7 @@ type Service struct {
 	Handler      handlers.Handler
 	AlarmTask    *alarm.BackgroundTask
 	MetricsTask  *metrics.BackgroundTask
+	PipelineTask *pipelines.BackgroundTask
 	lock         sync.RWMutex
 	logRequest   *os.File
 	logSql       *os.File
@@ -122,12 +124,15 @@ func NewService(conf *config.Config) (*Service, error) {
 
 	service.MetricsTask, err = metrics.NewBackgroundTask(conf, service.Store)
 	if err != nil {
-		return service, err
+		return service, Err.Wrap(&err, "failed to create metrics task")
 	}
 	service.AlarmTask, err = alarm.NewBackgroundTask(*conf, service.Store, service.MetricsTask)
 	if err != nil {
-		logrus.Fatal("", err)
-		return service, err
+		return service, Err.Wrap(&err, "failed to create alarm task")
+	}
+	service.PipelineTask, err = pipelines.NewBackgroundTask(conf, service.Store)
+	if err != nil {
+		return service, Err.Wrap(&err, "failed to create pipeline task")
 	}
 
 	service.Handler = handlers.NewHandler(service.Store, service.MetricsTask, *service.Config.GetPreferences(), requestLogger)
@@ -160,6 +165,13 @@ func (s *Service) Start() {
 			}
 		} else {
 			logrus.Info("Alarm task disabled")
+		}
+		if s.Config.Pipelines.Enabled {
+			err := s.PipelineTask.Start()
+			if err != nil {
+				err = Err.Wrap(&err, "failed to start pipeline task")
+				Err.Log(err)
+			}
 		}
 
 		logrus.Info("Listening on ", s.Server.Addr)
@@ -194,6 +206,7 @@ func (s *Service) Stop() {
 
 		s.AlarmTask.Stop()
 		s.MetricsTask.Stop()
+		s.PipelineTask.Stop()
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 		defer cancel()
 		err := s.Server.Shutdown(ctx)

@@ -95,6 +95,7 @@ func (bt *BackgroundTask) AddActivity(device string, groups *[]string, name stri
 }
 
 func (bt *BackgroundTask) loop() {
+	logrus.Info("Started pipelines task")
 	for {
 		select {
 		case <-bt.sigStop:

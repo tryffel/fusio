@@ -203,6 +203,17 @@ func NewPipeline(config string, store *storage.Store) (Pipeline, error) {
 	return p, nil
 }
 
+func ValidateBlocks(pipelineDto string) error {
+	gson := gjson.Parse(pipelineDto)
+
+	blocks := gson.Get("blocks")
+	_, err := NewStreamer(blocks)
+	if err != nil {
+		return Err.Wrap(&err, "failed to validate pipeline blocks")
+	}
+	return nil
+}
+
 // NewStream returns working stream aka pipeline
 func NewPipelineBytes(config []byte, store *storage.Store) (Pipeline, error) {
 

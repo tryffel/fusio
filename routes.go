@@ -55,6 +55,10 @@ func (s *Service) CreateRoutes() {
 	s.ApiRouter.HandleFunc("/alarms/outputs", s.Handler.CreateOutput).Methods("POST")
 	s.ApiRouter.HandleFunc("/alarms/outputchannels", s.Handler.CreateOutputChannel).Methods("POST")
 
+	/* PIPELINES */
+	s.ApiRouter.HandleFunc("/pipelines/{id}", s.Handler.GetPipelineById).Methods("GET")
+	s.ApiRouter.HandleFunc("/pipelines", s.Handler.CreatePipeline).Methods("POST")
+
 	/* SEARCH */
 	s.ApiRouter.HandleFunc("/groups/search", s.Handler.SearchGroupByName).Methods("GET")
 
